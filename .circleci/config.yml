@@ -44,7 +44,7 @@ commands:
           # A workspace allows us to pass files/artifacts from job to job.
           # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
           name: Create workspace
-          command: mkdir -p /tmp/workspace/<<parameters.environment>>
+          command: mkdir -p /tmp/workspace
       - checkout 
       - restore_cache: *restore-node-modules
       - run: 
@@ -63,6 +63,12 @@ commands:
       - run:
           name: Copy SPA assets to workspace
           command: cp -a build/. /tmp/workspace/<<parameters.environment>>
+      - run:
+          name: Show workspace contents
+          command: ls -la /tmp/workspace
+      - run:
+          name: Show workspace contents 2
+          command: ls -la /tmp/workspace/<<parameters.environment>>
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
