@@ -87,7 +87,7 @@ commands:
           command: az login --service-principal -u $SERVICE_PRINCIPAL_USER -p $SERVICE_PRINCIPAL_PASSWORD --tenant $SERVICE_PRINCIPAL_TENANT
       - run: 
           name: Publish SPA assets to Azure Storage
-          command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>> --destination app --pattern * --validate-content
+          command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>>/ --destination app --validate-content
 #      - run:
 #          name: Purge Azure CDN
 #          command: az cdn endpoint purge --resource-group $RESOURCE_GROUP_<<parameters.environment>> --profile-name $CDN_PROFILE --name $STORAGE_ACCOUNT_<<parameters.environment>> --content-paths '/'
