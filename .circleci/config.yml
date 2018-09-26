@@ -32,28 +32,22 @@ jobs:
     steps:
       - run:
           name: Configure build environment
-          command: 
-            - >-
-              case "$CIRCLE_BRANCH" in
-              master) BUILD_ENV=production ;;
-              *) BUILD_ENV=test ;;
-              esac
-              echo $BUILD_ENV
+          command: sh ./configure_build_env.sh
       - checkout 
       - restore_cache: *restore-node-modules
       - run: 
           name: Install SPA packages
-          command: cd app && yarn install
+          command: yarn install
       - save_cache: *save-node-modules
       - run: 
           name: Test SPA app
-          command: cd app && yarn test -w 1 --coverage
+          command: yarn test -w 1 --coverage
       - run: 
           name: Configure build parameters
           command: cp .env.$BUILD_ENV .env.local
       - run: 
           name: Build SPA app
-          command: build-spa
+          command: yarn build
 # Job orchestration
 workflows:
   version: 2
