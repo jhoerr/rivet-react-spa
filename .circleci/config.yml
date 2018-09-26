@@ -81,13 +81,19 @@ commands:
         default: "test"
     steps:
       - attach_workspace:
-          at: /tmp/workspace/<<parameters.environment>>
+          at: /tmp/workspace
       - run:
           name: Login with Azure Service Principal
           command: az login --service-principal -u $SERVICE_PRINCIPAL_USER -p $SERVICE_PRINCIPAL_PASSWORD --tenant $SERVICE_PRINCIPAL_TENANT
+      - run:
+          name: Show workspace contents
+          command: ls -la /tmp/workspace
+      - run:
+          name: Show workspace contents 2
+          command: ls -la /tmp/workspace/<<parameters.environment>>
       - run: 
           name: Publish SPA assets to Azure Storage
-          command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>>/ --destination app --destination-path "" --validate-content --dryrun
+          command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>> --destination app --validate-content --dryrun
 #      - run:
 #          name: Purge Azure CDN
 #          command: az cdn endpoint purge --resource-group $RESOURCE_GROUP_<<parameters.environment>> --profile-name $CDN_PROFILE --name $STORAGE_ACCOUNT_<<parameters.environment>> --content-paths '/'
