@@ -42,9 +42,9 @@ commands:
           name: Install SPA packages
           command: yarn install
       - save_cache: *save-node-modules
-      - run: 
-          name: Test SPA app
-          command: yarn test -w 1 --coverage
+#      - run: 
+#          name: Test SPA app
+#          command: yarn test -w 1 --coverage
       - run: 
           name: Configure build parameters
           command: cp .env.<<parameters.environment>> .env.local
