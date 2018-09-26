@@ -2,7 +2,7 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
 
 # Aliases are shorthand references for common settings.
 aliases:
@@ -24,11 +24,17 @@ aliases:
     branches:
       ignore: gh-pages
 
-# Job definitions. Job execution is orchestrated in the 'workflows' section.
-jobs:
-  build_spa:
-    docker:
-      - image: circleci/node:8
+defaults: &defaults
+  docker:
+    - image: circleci/node:8
+
+commands:
+  build_test_deploy:
+    description: "Build/test/deploy app to target environment"
+    parameters:
+      environment:
+        type: string
+        default: "test"
     steps:
       - checkout 
       - run:
@@ -39,15 +45,29 @@ jobs:
           name: Install SPA packages
           command: yarn install
       - save_cache: *save-node-modules
-#      - run: 
-#          name: Test SPA app
-#          command: yarn test -w 1 --coverage
+      - run: 
+          name: Test SPA app
+          command: yarn test -w 1 --coverage
       - run: 
           name: Configure build parameters
-          command: cp .env.$BUILD_ENV .env.local
+          command: cp .env.<<parameters.environment>> .env.local
       - run: 
           name: Build SPA app
           command: yarn build
+
+# Job definitions. Job execution is orchestrated in the 'workflows' section.
+jobs:
+  deploy_to_test:
+    <<: *defaults
+    steps:
+      - build_test_deploy:
+          environment: "test"
+  deploy_to_production:
+    <<: *defaults
+    steps:
+      - build_test_deploy:
+          environment: "production"
+
 # Job orchestration
 workflows:
   version: 2
@@ -55,5 +75,7 @@ workflows:
   # Publish the style guide on successful build/test of master.
   build-and-publish:
     jobs:
-      - build_spa:
+      - deploy_to_test:
           filters: *filter-ignore-gh-pages
+      - deploy_to_production:
+          filters: *filter-only-master
