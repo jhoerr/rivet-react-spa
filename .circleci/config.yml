@@ -37,9 +37,6 @@ commands:
         default: "test"
     steps:
       - checkout 
-      - run:
-          name: Configure build environment
-          command: sh ./configure_build_env.sh
       - restore_cache: *restore-node-modules
       - run: 
           name: Install SPA packages
