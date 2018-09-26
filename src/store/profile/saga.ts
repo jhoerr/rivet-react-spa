@@ -12,7 +12,7 @@ const API_ENDPOINT = process.env.REACT_APP_API_URL || ''
 function* handleFetch() {
   try {
     const state = (yield select<IApplicationState>((s) => s.profile.request)) as IProfileRequest
-    const path = state.id === 0 ? "/me" : `profile/${state.id}`
+    const path = state.id === 0 ? "/me" : `users/${state.id}`
     const response = yield call(callApiWithAuth, 'get', API_ENDPOINT, path)
     console.log ("in try block", response)
     if (response.errors) {
@@ -37,7 +37,7 @@ function* handleUpdate() {
   try {
     const form = (yield select<any>((s) => s.form.profile.values)) as IProfileUpdateRequest
     const req = (yield select<IApplicationState>((s) => s.profile.request)) as IProfileRequest
-    const path = `/profile/${req.id}`
+    const path = `/users/${req.id}`
     const response = yield call(callApiWithAuth, 'put', API_ENDPOINT, path, form)
     console.log ("in try block", response)
     if (response.errors) {

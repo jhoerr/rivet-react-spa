@@ -29,8 +29,8 @@ const ProfileForm : React.SFC<IApiState2<IProfile> & IProfileFormProps & Injecte
                 { data &&
                   <>
                     <List>
-                        <li><strong>Username:</strong> {data.username}</li>
-                        <li><strong>Display Name:</strong> {data.preferredName}</li>
+                        <li><strong>Username:</strong> {data.netId}</li>
+                        <li><strong>Display Name:</strong> {data.name}</li>
                         <li><strong>Department:</strong> {data.department}</li>
                     </List>
                     <Form  label="Profile update" labelVisibility="screen-reader-only" method="GET" onSubmit={handleSubmit}>
