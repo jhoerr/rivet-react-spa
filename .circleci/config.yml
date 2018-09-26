@@ -120,8 +120,10 @@ workflows:
       - deploy_to_test:
           requires: 
             - build_for_test
+          context: azfun-fsharp
       - build_for_production:
           filters: *filter-only-master
       - deploy_to_production:
           requires: 
             - build_for_production
+          context: azfun-fsharp
