@@ -24,18 +24,27 @@ aliases:
     branches:
       ignore: gh-pages
 
-defaults: &defaults
+defaults: &nodeDefaults
   docker:
     - image: circleci/node:8
 
+defaults: &azureDefaults
+  docker:
+    - image: microsoft/azure-cli
+
 commands:
-  build_test_deploy:
-    description: "Build/test/deploy app to target environment"
+  build:
+    description: "Test app and build for target environment"
     parameters:
       environment:
         type: string
         default: "test"
     steps:
+      - run:
+          # A workspace allows us to pass files/artifacts from job to job.
+          # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
+          name: Create workspace
+          command: mkdir -p /tmp/workspace/<<parameters.environment>>
       - checkout 
       - restore_cache: *restore-node-modules
       - run: 
@@ -47,22 +56,56 @@ commands:
 #          command: yarn test -w 1 --coverage
       - run: 
           name: Configure build parameters
-          command: cp .env.<<parameters.environment>> .env.local
+          command: cp .env.<<parameters.environment>> .env.production.local
       - run: 
           name: Build SPA app
           command: yarn build
-
+      - run:
+          name: Copy SPA assets to workspace
+          command: cp -a build/. /tmp/workspace/<<parameters.environment>>
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - <<parameters.environment>>
+  deploy:
+    description: "Deploy app assets to target environment"
+    parameters:
+      environment:
+        type: string
+        default: "test"
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace/<<parameters.environment>>
+      - run:
+          name: Login with Azure Service Principal
+          command: az login --service-principal -u $SERVICE_PRINCIPAL_USER -p $SERVICE_PRINCIPAL_PASSWORD --tenant $SERVICE_PRINCIPAL_TENANT
+      - run: 
+          name: Publish SPA assets to Azure Storage
+          command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> -d app -s /tmp/workspace/<<parameters.environment>>
+#      - run:
+#          name: Purge Azure CDN
+#          command: az cdn endpoint purge --resource-group $RESOURCE_GROUP_<<parameters.environment>> --profile-name $CDN_PROFILE --name $STORAGE_ACCOUNT_<<parameters.environment>> --content-paths '/'
 # Job definitions. Job execution is orchestrated in the 'workflows' section.
 jobs:
-  deploy_to_test:
-    <<: *defaults
+  build_for_test:
+    <<: *nodeDefaults
     steps:
-      - build_test_deploy:
+      - build:
+          environment: "test"
+  build_for_production:
+    <<: *nodeDefaults
+    steps:
+      - build:
+          environment: "production"
+  deploy_to_test:
+    <<: *azureDefaults
+    steps:
+      - deploy:
           environment: "test"
   deploy_to_production:
-    <<: *defaults
+    <<: *azureDefaults
     steps:
-      - build_test_deploy:
+      - deploy:
           environment: "production"
 
 # Job orchestration
@@ -72,7 +115,13 @@ workflows:
   # Publish the style guide on successful build/test of master.
   build-and-publish:
     jobs:
-      - deploy_to_test:
+      - build_for_test:
           filters: *filter-ignore-gh-pages
-      - deploy_to_production:
+#      - deploy_to_test:
+#          requires: 
+ #           - build_for_test
+      - build_for_production:
           filters: *filter-only-master
+      - deploy_to_production:
+          requires: 
+            - build_for_production
