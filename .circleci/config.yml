@@ -4,34 +4,6 @@
 #
 version: 2.1
 
-# Aliases are shorthand references for common settings.
-aliases:
-  # Cache Management
-  - &restore-node-modules
-      keys:
-        - v2-node-modules-{{ checksum "package.json" }}
-  - &save-node-modules
-      paths:
-        - node_modules
-      key: v2-node-modules-{{ checksum "package.json" }}
-
-  # Branch Filtering
-  - &filter-only-master
-    branches:
-      only:
-        - master
-  - &filter-ignore-gh-pages
-    branches:
-      ignore: gh-pages
-
-defaults: &nodeDefaults
-  docker:
-    - image: circleci/node:8
-
-defaults: &azureDefaults
-  docker:
-    - image: microsoft/azure-cli
-
 commands:
   build:
     description: "Test app and build for target environment"
@@ -46,11 +18,16 @@ commands:
           name: Create workspace
           command: mkdir -p /tmp/workspace
       - checkout 
-      - restore_cache: *restore-node-modules
+      - restore_cache:
+          keys:
+            - v2-node-modules-{{ checksum "package.json" }}
       - run: 
           name: Install SPA packages
           command: yarn install
-      - save_cache: *save-node-modules
+      - save_cache:
+          paths:
+            - node_modules
+          key: v2-node-modules-{{ checksum "package.json" }}
 #      - run: 
 #          name: Test SPA app
 #          command: yarn test -w 1 --coverage
@@ -91,22 +68,26 @@ commands:
 # Job definitions. Job execution is orchestrated in the 'workflows' section.
 jobs:
   build_for_test:
-    <<: *nodeDefaults
+    docker:
+      - image: circleci/node:8
     steps:
       - build:
           environment: "test"
   build_for_production:
-    <<: *nodeDefaults
+    docker:
+      - image: circleci/node:8
     steps:
       - build:
           environment: "production"
   deploy_to_test:
-    <<: *azureDefaults
+    docker:
+      - image: microsoft/azure-cli
     steps:
       - deploy:
           environment: "test"
   deploy_to_production:
-    <<: *azureDefaults
+    docker:
+      - image: microsoft/azure-cli
     steps:
       - deploy:
           environment: "production"
@@ -119,13 +100,18 @@ workflows:
   build-publish:
     jobs:
       - build_for_test:
-          filters: *filter-ignore-gh-pages
+          filters:
+            branches:
+              ignore: gh-pages
       - deploy_to_test:
           requires: 
             - build_for_test
           context: azfun-fsharp
       - build_for_production:
-          filters: *filter-only-master
+          filters: 
+            branches:
+              only:
+              - master
       - deploy_to_production:
           requires: 
             - build_for_production
