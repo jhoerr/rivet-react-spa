@@ -85,9 +85,9 @@ commands:
       - run: 
           name: Publish SPA assets to Azure Storage Container
           command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>> --destination app --validate-content
-#      - run:
-#          name: Purge Azure CDN
-#          command: az cdn endpoint purge --resource-group $RESOURCE_GROUP_<<parameters.environment>> --profile-name $CDN_PROFILE --name $STORAGE_ACCOUNT_<<parameters.environment>> --content-paths '/'
+      - run:
+          name: Purge Azure CDN
+          command: az cdn endpoint purge --resource-group $RESOURCE_GROUP_<<parameters.environment>> --profile-name $CDN_PROFILE --name $STORAGE_ACCOUNT_<<parameters.environment>> --content-paths '/'
 # Job definitions. Job execution is orchestrated in the 'workflows' section.
 jobs:
   build_for_test:
