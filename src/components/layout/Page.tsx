@@ -22,7 +22,7 @@ interface IPropsFromDispatch {
 const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signIn, signOut, children }) => (
   <>
     <Header title="IT Pro Database">
-      { user &&
+      { /* user &&
           <HeaderNavigation>
             <a href="#">Nav one</a>
             <HeaderMenu label="Nav two">
@@ -46,7 +46,7 @@ const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signIn, signOu
               </div>
             </React.Fragment>
           </HeaderNavigation>
-      }
+      */ }
       { user &&
           <HeaderIdentity username={user.user_name} onLogout={signOut}>
             <a href="/me">Profile</a>
