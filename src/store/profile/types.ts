@@ -23,11 +23,20 @@ export interface IProfileUpdateRequest {
     expertise: string
 }
 
-export interface IProfile extends IProfileUpdateRequest {
+export interface IRole {
+    department: string,
+    role: string
+}
+
+export interface IUser extends IProfileUpdateRequest {
     id: number,
     netId: string,
-    name: string,
-    department: string,
+    name: string
+}
+
+export interface IProfile {
+    user: IUser,
+    roles: IRole[]
 }
 
 export interface IProfileState extends IApiState<IProfileRequest, IProfile> { 

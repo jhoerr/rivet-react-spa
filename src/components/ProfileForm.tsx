@@ -15,27 +15,30 @@ const ix = (props:any) => (
 
 const ProfileForm : React.SFC<IApiState2<IProfile> & IProfileFormProps & InjectedFormProps<{}, IProfile & IProfileFormProps>> = 
 ({ loading, error, data, onSubmit }) => {
-   
-    const id = data ? data.id : 0
 
     const handleSubmit = (e:any)=> {
         e.preventDefault();
-        onSubmit({ id });
+        const id = data && data.user ? data.user.id : 0
+        onSubmit({id});
     }
 
     return (
             <>
                 { !data && loading && <p>Loading...</p>}
-                { data &&
+                { data && data.user && 
                   <>
+                    <h2>User</h2>
                     <List>
-                        <li><strong>Username:</strong> {data.netId}</li>
-                        <li><strong>Display Name:</strong> {data.name}</li>
-                        <li><strong>Department:</strong> {data.department}</li>
+                        <li><strong>NetId:</strong> {data.user.netId}</li>
+                        <li><strong>Name:</strong> {data.user.name}</li>
+                    </List>
+                    <h2>Roles</h2>
+                    <List>
+                        {data.roles.map((r,i) => (<li key={i}><strong>{r.department}:</strong> {r.role}</li>))}
                     </List>
                     <Form  label="Profile update" labelVisibility="screen-reader-only" method="GET" onSubmit={handleSubmit}>
                         <Field type="text" name="expertise" component={ix} label="Expertise" margin={{ bottom: 'md' }}/>        
-                        <Button type="submit" disabled={loading}>Submit</Button>
+                        <Button type="submit" disabled={loading}>Update</Button>
                     </Form>
                   </>
                 }

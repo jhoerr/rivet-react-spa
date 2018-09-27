@@ -5,7 +5,7 @@ import { IApplicationState } from '../store';
 import { profileFetchRequest, profileUpdateRequest } from '../store/profile/actions';
 import { IProfileRequest, IProfileState } from '../store/profile/types';
 import PageTitle from './layout/PageTitle';
-import ProfileForm from './ProfileForm';
+// import ProfileForm from './ProfileForm';
 import ReadOnlyProfile from './ReadOnlyProfile';
 
 interface IProfileProps {
@@ -36,10 +36,10 @@ class ProfileContainer extends React.Component<IProfileState & IProfileProps & I
         return (
             <>
                 <PageTitle>Profile</PageTitle>
-                { this.props.data && !this.isMyProfile() && 
-                    <ReadOnlyProfile  {...this.props.data} /> }                        
-                { this.isMyProfile() && 
-                    <ProfileForm initialValues={this.props.data} {...this.props} onSubmit={this.props.profileUpdateRequest}/> }
+                { this.props.loading && 
+                    <p>Loading profile...</p>}
+                { this.props.data && 
+                    <ReadOnlyProfile  {...this.props.data} /> }
                 { this.props.error && 
                     <p>{this.props.error}</p> }
             </>

@@ -4,7 +4,7 @@ import { signInRequest  } from '../auth/actions'
 import { callApiWithAuth } from '../effects'
 import { IApplicationState } from '../index';
 import { profileFetchError, profileFetchSuccess } from './actions'
-import { IProfileRequest, IProfileUpdateRequest, ProfileActionTypes } from './types'
+import { IProfile, IProfileRequest, IProfileUpdateRequest, ProfileActionTypes } from './types'
 
 
 const API_ENDPOINT = process.env.REACT_APP_API_URL || ''
@@ -35,15 +35,16 @@ function* handleFetch() {
 
 function* handleUpdate() {
   try {
+    const profile = (yield select<IApplicationState>((s) => s.profile.data)) as IProfile
     const form = (yield select<any>((s) => s.form.profile.values)) as IProfileUpdateRequest
     const req = (yield select<IApplicationState>((s) => s.profile.request)) as IProfileRequest
-    const path = `/users/${req.id}`
-    const response = yield call(callApiWithAuth, 'put', API_ENDPOINT, path, form)
+    const response = yield call(callApiWithAuth, 'put', API_ENDPOINT, `/users/${req.id}`, form)
     console.log ("in try block", response)
     if (response.errors) {
       yield put(profileFetchError(response.errors))
     } else {
-      yield put(profileFetchSuccess(response))
+      profile.user = response
+      yield put(profileFetchSuccess(profile))
     }
   } catch (err) {
     console.log ("in catch block", err)

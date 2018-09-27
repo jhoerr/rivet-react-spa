@@ -49,7 +49,7 @@ const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signIn, signOu
       }
       { user &&
           <HeaderIdentity username={user.user_name} onLogout={signOut}>
-            <a href="/profile">Profile</a>
+            <a href="/me">Profile</a>
           </HeaderIdentity>
       }
       { !user &&

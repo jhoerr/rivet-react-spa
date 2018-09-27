@@ -3,12 +3,17 @@ import { List } from "rivet-react";
 import { IProfile } from "../store/profile/types";
 
 const ReadOnlyProfile : React.SFC<IProfile> = 
-({ netId, name, department, expertise }) => (
+({ user, roles }) => (
+    <>
+        <h2>User</h2>
         <List>
-            <li><strong>Username:</strong> {netId}</li>
-            <li><strong>Display Name:</strong> {name}</li>
-            <li><strong>Department:</strong> {department}</li>
-            <li><strong>Expertise:</strong> {expertise}</li>
+            <li><strong>NetId:</strong> {user.netId}</li>
+            <li><strong>Name:</strong> {user.name}</li>
         </List>
+        <h2>Roles</h2>
+        <List>
+            {roles.map(r => (<li><strong>{r.department}:</strong> {r.role}</li>))}
+        </List>
+    </>
 )
 export default ReadOnlyProfile
