@@ -80,7 +80,10 @@ commands:
           name: Login with Azure Service Principal
           command: az login --service-principal -u $SERVICE_PRINCIPAL_USER -p $SERVICE_PRINCIPAL_PASSWORD --tenant $SERVICE_PRINCIPAL_TENANT
       - run: 
-          name: Publish SPA assets to Azure Storage
+          name: Ensure Azure Storage Container exists
+          command: az storage container create --name app --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --public-access container
+      - run: 
+          name: Publish SPA assets to Azure Storage Container
           command: az storage blob upload-batch --account-name $STORAGE_ACCOUNT_<<parameters.environment>> --source /tmp/workspace/<<parameters.environment>> --destination app --validate-content
 #      - run:
 #          name: Purge Azure CDN
@@ -113,7 +116,7 @@ workflows:
   version: 2
   # Build and test the code on every commit. 
   # Publish the style guide on successful build/test of master.
-  build-and-publish:
+  build-publish:
     jobs:
       - build_for_test:
           filters: *filter-ignore-gh-pages
