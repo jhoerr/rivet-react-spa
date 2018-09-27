@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { Footer, Header, HeaderIdentity, HeaderMenu, HeaderNavigation } from 'rivet-react';
+import { Footer, Header, HeaderIdentity, HeaderNavigation } from 'rivet-react';
 import { IApplicationState  } from '../../store'
 import { signInRequest, signOutRequest } from '../../store/auth/actions'
 import { IAuthUser } from '../../store/auth/types';
