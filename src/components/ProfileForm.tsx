@@ -2,18 +2,17 @@ import * as React from 'react'
 import { Field,InjectedFormProps, reduxForm } from 'redux-form'
 import { Button, Form, Input, List } from "rivet-react";
 import { IApiState2 } from '../store/common';
-import { profileUpdateRequest } from '../store/profile/actions';
-import { IProfile } from "../store/profile/types";
+import * as profile from "../store/profile"
 
 interface IProfileFormProps {
-    onSubmit: typeof profileUpdateRequest
+    onSubmit: typeof profile.updateRequest
 }
 
 const ix = (props:any) => (
     <Input {...props.input} {...props} />
 )
 
-const ProfileForm : React.SFC<IApiState2<IProfile> & IProfileFormProps & InjectedFormProps<{}, IProfile & IProfileFormProps>> = 
+const ProfileForm : React.SFC<IApiState2<profile.IProps> & IProfileFormProps & InjectedFormProps<{}, profile.IProps & IProfileFormProps>> = 
 ({ loading, error, data, onSubmit }) => {
 
     const handleSubmit = (e:any)=> {

@@ -1,8 +1,7 @@
 import { IApiState } from './common'
-import { IProfile } from './profile/types';
+import { IProps } from './profile';
 
-// TYPES
-
+//#region TYPES
 export const enum SearchActionTypes {
     SEARCH_SIMPLE_FETCH_REQUEST = '@@search/SEARCH_SIMPLE_FETCH_REQUEST',
     SEARCH_SIMPLE_FETCH_SUCCESS = '@@search/SEARCH_SIMPLE_FETCH_SUCCESS',
@@ -14,33 +13,29 @@ export interface ISimpleSearchRequest {
 }
 
 export interface ISimpleSearchResult extends ISimpleSearchRequest {
-    profiles: IProfile[]
+    profiles: IProps[]
 }
 
-export interface ISimpleSearchState extends IApiState<ISimpleSearchRequest, ISimpleSearchResult> { 
+export interface IState extends IApiState<ISimpleSearchRequest, ISimpleSearchResult> { 
 }
+//#endregion
 
-// ACTIONS
 
+
+//#region ACTIONS
 import { action } from 'typesafe-actions'
 
 const simpleSearchFetchRequest = (request: ISimpleSearchRequest) => action(SearchActionTypes.SEARCH_SIMPLE_FETCH_REQUEST, request)
 const simpleSearchFetchSuccess = (data: ISimpleSearchResult) => action(SearchActionTypes.SEARCH_SIMPLE_FETCH_SUCCESS, data)
 const simpleSearchFetchError = (error: string) => action(SearchActionTypes.SEARCH_SIMPLE_FETCH_ERROR, error)
+//#endregion
 
-export {
-    simpleSearchFetchRequest,
-    simpleSearchFetchError,
-    simpleSearchFetchSuccess
-}
-
-// REDUCER
-
+//#region REDUCER
 import { Reducer } from 'redux'
 import { FetchErrorReducer, FetchRequestReducer, FetchSuccessReducer } from './common'
 
 // Type-safe initialState!
-const initialState: ISimpleSearchState = {
+const initialState: IState = {
     data: undefined,
     error: undefined,
     loading: false,
@@ -49,7 +44,7 @@ const initialState: ISimpleSearchState = {
 
 // Thanks to Redux 4's much simpler typings, we can take away a lot of typings on the reducer side,
 // everything will remain type-safe.
-const reducer: Reducer<ISimpleSearchState> = (state = initialState, act) => {
+const reducer: Reducer<IState> = (state = initialState, act) => {
   switch (act.type) {
     case SearchActionTypes.SEARCH_SIMPLE_FETCH_REQUEST: return FetchRequestReducer(state, act)
     case SearchActionTypes.SEARCH_SIMPLE_FETCH_SUCCESS: return FetchSuccessReducer(state, act)
@@ -57,20 +52,13 @@ const reducer: Reducer<ISimpleSearchState> = (state = initialState, act) => {
     default: return state
   }
 }
-
-// Instead of using default export, we use named exports. That way we can group these exports
-// inside the `index.js` folder.
-export { 
-  reducer as searchReducer,
-  initialState as initialSearchState
-}
+//#endregion
 
 
-// SAGA
-
+//#region SAGA
 import { all, call, fork, put, select, takeEvery } from 'redux-saga/effects'
 import { NotAuthorizedError } from '../components/errors';
-import { signInRequest } from './auth/actions';
+import { signInRequest } from './auth';
 import { callApiWithAuth } from './effects'
 import { IApplicationState } from './index';
 
@@ -78,7 +66,7 @@ const API_ENDPOINT = process.env.REACT_APP_API_URL || ''
 
 function* handleFetch() {
   try {
-    const state = (yield select<IApplicationState>((s) => s.simplesearch.request)) as ISimpleSearchRequest
+    const state = (yield select<IApplicationState>((s) => s.searchSimple.request)) as ISimpleSearchRequest
     const path = `search?term=${state.term}`
     const response = yield call(callApiWithAuth, 'get', API_ENDPOINT, path)
     console.log ("in try block", response)
@@ -107,8 +95,19 @@ function* watchSimpleSearchFetch() {
 }
 
 // We can also use `fork()` here to split our saga into multiple watchers.
-function* profileSaga() {
+function* saga() {
   yield all([fork(watchSimpleSearchFetch)])
 }
+//#endregion
 
-export default profileSaga
+
+// Instead of using default export, we use named exports. That way we can group these exports
+// inside the `index.js` folder.
+export { 
+  simpleSearchFetchRequest,
+  simpleSearchFetchError,
+  simpleSearchFetchSuccess,
+  reducer,
+  initialState,
+  saga
+}

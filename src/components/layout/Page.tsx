@@ -3,23 +3,22 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { Footer, Header, HeaderIdentity, HeaderNavigation } from 'rivet-react';
 import { IApplicationState  } from '../../store'
-import { signInRequest, signOutRequest } from '../../store/auth/actions'
-import { IAuthUser } from '../../store/auth/types';
+import * as Auth from '../../store/auth'
 // import { simpleSearchFetchRequest } from '../../store/search';
 
 export interface IPageProps {
     children?: React.ReactNode
-    user?: IAuthUser
+    user?: Auth.IAuthUser
 }
 
 // We can use `typeof` here to map our dispatch types to the props, like so.
 interface IPropsFromDispatch {
-  signIn: typeof signInRequest
-  signOut: typeof signOutRequest
+  signInRequest: typeof Auth.signInRequest
+  signOutRequest: typeof Auth.signOutRequest
   // search: typeof simpleSearchFetchRequest
 }
 
-const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signIn, signOut, children }) => (
+const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signInRequest, signOutRequest, children }) => (
   <>
     <Header title="IT Pro Database">
       { /* user &&
@@ -48,13 +47,13 @@ const Page: React.SFC<IPageProps & IPropsFromDispatch> = ({ user, signIn, signOu
           </HeaderNavigation>
       */ }
       { user &&
-          <HeaderIdentity username={user.user_name} onLogout={signOut}>
+          <HeaderIdentity username={user.user_name} onLogout={signOutRequest}>
             <a href="/me">Profile</a>
           </HeaderIdentity>
       }
       { !user &&
         <HeaderNavigation>
-          <a href="#" onClick={signIn}>Log In</a>
+          <a href="#" onClick={signInRequest}>Log In</a>
         </HeaderNavigation>
       }
     </Header>
@@ -75,8 +74,8 @@ const mapStateToProps = ({ auth }: IApplicationState) => ({
 // mapDispatchToProps is especially useful for constraining our actions to the connected component.
 // You can access these via `this.props`.
 const mapDispatchToProps = (dispatch: Dispatch) : IPropsFromDispatch => ({
-  signIn: () => dispatch(signInRequest()),
-  signOut: () => dispatch(signOutRequest()),
+  signInRequest: () => dispatch(Auth.signInRequest()),
+  signOutRequest: () => dispatch(Auth.signOutRequest()),
   // simpleSearch: () => dispatch(simpleSearchFetchRequest())
 })
 

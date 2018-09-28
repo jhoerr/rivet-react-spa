@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { List } from "rivet-react";
-import { IProfile } from "../store/profile/types";
+import { IProps } from "../store/profile";
 
-const ReadOnlyProfile : React.SFC<IProfile> = 
+const ReadOnlyProfile : React.SFC<IProps> = 
 ({ user, roles }) => (
     <>
         <h2>User</h2>

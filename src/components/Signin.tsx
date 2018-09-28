@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { IApplicationState  } from '../store'
-import { postSignInRequest  } from '../store/auth/actions'
-import { IAuthRequest, IAuthState,   } from '../store/auth/types'
+import * as Auth from '../store/auth'
 
 interface ILocationProps {
     search: string;
@@ -16,14 +15,14 @@ interface ISigninProps {
 }
 // We can use `typeof` here to map our dispatch types to the props, like so.
 interface IPropsFromDispatch {
-    signInRequest: typeof postSignInRequest
+    postSignInRequest: typeof Auth.postSignInRequest
 }
 
-class Signin extends React.Component<IAuthState & ISigninProps & IPropsFromDispatch> {
+class Signin extends React.Component<Auth.IState & ISigninProps & IPropsFromDispatch> {
 
     public componentDidMount() {
         const queryParam = queryString.parse(this.props.location.search)
-        this.props.signInRequest({ code: queryParam.code })
+        this.props.postSignInRequest({ code: queryParam.code })
     }
 
     public render () {
@@ -48,17 +47,18 @@ class Signin extends React.Component<IAuthState & ISigninProps & IPropsFromDispa
 // It's usually good practice to only include one context at a time in a connected component.
 // Although if necessary, you can always include multiple contexts. Just make sure to
 // separate them from each other to prevent prop conflicts.
-const mapStateToProps = ({ auth }: IApplicationState) : IAuthState => auth
+const mapStateToProps = (state: IApplicationState) => 
+    state.auth
   
   // mapDispatchToProps is especially useful for constraining our actions to the connected component.
   // You can access these via `this.props`.
   const mapDispatchToProps = (dispatch: Dispatch) => ({
-    signInRequest: (request:IAuthRequest) => dispatch(postSignInRequest(request))
+    postSignInRequest: (request:Auth.IAuthRequest) => dispatch(Auth.postSignInRequest(request))
   })
   
 // Now let's connect our component!
 // With redux v4's improved typings, we can finally omit generics here.
-export default connect<IAuthState, IPropsFromDispatch>(
+export default connect<Auth.IState, IPropsFromDispatch>(
     mapStateToProps,
     mapDispatchToProps
   )(Signin)

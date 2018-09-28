@@ -2,28 +2,23 @@ import { Action, AnyAction, combineReducers, Dispatch } from 'redux'
 import { reducer as formReducer } from 'redux-form'
 import { all, fork } from 'redux-saga/effects'
 
-import { authReducer, initialAuthState } from './auth/reducer'
-import authSaga from './auth/saga'
-import { IAuthState } from './auth/types'
-
-import { initialProfileState, profileReducer } from './profile/reducer'
-import profileSaga from './profile/saga';
-import { IProfileState } from './profile/types';
-import { initialSearchState, ISimpleSearchState, searchReducer,  } from './search';
+import * as Auth from './auth'
+import * as Profile from './profile'
+import * as SearchSimple from './searchSimple'
 
 // The top-level state object
 export interface IApplicationState {
-  auth: IAuthState,
-  profile: IProfileState,
-  simplesearch: ISimpleSearchState
+  auth: Auth.IState,
+  profile: Profile.IState,
+  searchSimple: SearchSimple.IState
   form: any
 }
 
 export const initialState : IApplicationState = {
-  auth: initialAuthState,
+  auth: Auth.initialState,
   form: {},
-  profile: initialProfileState,
-  simplesearch: initialSearchState
+  profile: Profile.initialState,
+  searchSimple: SearchSimple.initialState
 }
 
 // Additional props for connected React components. This prop is passed by default with `connect()`
@@ -35,15 +30,15 @@ export interface IConnectedReduxProps<A extends Action = AnyAction> {
 // using the reducer with the matching name. It's important that the names match exactly, and that
 // the reducer acts on the corresponding ApplicationState property type.
 export const rootReducer = combineReducers<IApplicationState>({
-  auth: authReducer,
+  auth: Auth.reducer,
   form: formReducer,
-  profile: profileReducer,
-  simplesearch: searchReducer
+  profile: Profile.reducer,
+  searchSimple: SearchSimple.reducer
 })
 
 // Here we use `redux-saga` to trigger actions asynchronously. `redux-saga` uses something called a
 // "generator function", which you can read about here:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
 export function* rootSaga() {
-  yield all([fork(authSaga), fork(profileSaga)])
+  yield all([fork(Auth.saga), fork(Profile.saga)])
 }
