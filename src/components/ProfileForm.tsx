@@ -30,6 +30,11 @@ const ProfileForm : React.SFC<IApiState2<profile.IProps> & IProfileFormProps & I
                     <List>
                         <li><strong>NetId:</strong> {data.user.netId}</li>
                         <li><strong>Name:</strong> {data.user.name}</li>
+                        <li><strong>Position:</strong> {data.user.position}</li>
+                        <li><strong>Campus:</strong> {data.user.locationCode}</li>
+                        <li><strong>Campus Location:</strong> {data.user.location || '(not provided)'}</li>
+                        <li><strong>Campus Email:</strong> {data.user.campusEmail}</li>
+                        <li><strong>Campus Phone:</strong> {data.user.campusPhone || '(not provided)'}</li>
                     </List>
                     <h2>Roles</h2>
                     <List>

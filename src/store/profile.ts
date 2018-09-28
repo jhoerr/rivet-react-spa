@@ -26,7 +26,12 @@ export interface IRole {
 export interface IUser extends IUpdateRequest {
     id: number,
     netId: string,
-    name: string
+    name: string,
+    position: string,
+    location: string,
+    locationCode: string,
+    campusPhone: string,
+    campusEmail: string,
 }
 
 export interface IProps {
